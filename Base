@@ -1,0 +1,46 @@
+package com.pack1;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class AdJavaPro1 {
+
+   
+    static final String DRIVER = "oracle.jdbc.OracleDriver";
+     static final String URL = "jdbc:oracle:thin:@localhost:1521/orclpdb";
+     static final String USER = "system";
+     static final String PASSWORD = "sriram";
+
+    
+    public void connect() {
+        System.out.println("Connecting to database...");
+
+        try {
+           
+            Class.forName(DRIVER);
+
+         
+            Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+
+            System.out.println("Connection created successfully");
+
+          
+            con.close();
+
+        } catch (ClassNotFoundException e) {
+            
+            e.printStackTrace();
+
+        } catch (SQLException e) {
+            System.out.println("Database connection failed");
+            e.printStackTrace();
+        }
+    }
+
+  
+    public static void main(String[] args) {
+        AdJavaPro1 obj = new AdJavaPro1();
+        obj.connect();
+    }
+}
