@@ -174,4 +174,203 @@ public class JdbcTask4 {
 	        }
 	    }
 	}
+======================================================================================================================================================
+package com.pack1;
+
+	import java.sql.*;
+	import java.util.Scanner;
+
+	public class JdbcTask5 {
+
+	    // Database details
+	    static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
+	    static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
+	    static final String USER = "system";
+	    static final String PASSWORD = "sriram";
+
+	    // Single Scanner (BEST PRACTICE)
+	    static Scanner sc = new Scanner(System.in);
+	    
+
+	    // Get Connection
+	    public static Connection getConnection() throws Exception {
+	        Class.forName(DRIVER);
+	        return DriverManager.getConnection(URL, USER, PASSWORD);
+	    }
+
+	    // 1️⃣ Add Patient
+	    public static void addPatient() {
+	        try (Connection con = getConnection()) {
+
+	            String sql = "INSERT INTO Patient VALUES (?, ?, ?, ?)";
+	            PreparedStatement ps = con.prepareStatement(sql);
+
+	            System.out.print("Enter Patient ID: ");
+	            String id = sc.nextLine();
+
+	            System.out.print("Enter Patient Name: ");
+	            String name = sc.nextLine();
+
+	            System.out.print("Enter Patient Age: ");
+	            int age = Integer.parseInt(sc.nextLine());
+
+	            System.out.print("Enter Patient Contact: ");
+	            long contact = Long.parseLong(sc.nextLine());
+
+	            ps.setString(1, id);
+	            ps.setString(2, name);
+	            ps.setInt(3, age);
+	            ps.setLong(4, contact);
+
+	            int rows = ps.executeUpdate();
+	            if (rows > 0)
+	                System.out.println("Patient Added Successfully");
+	            else
+	                System.out.println("Patient Not Added");
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    // 2️⃣ View All Patients
+	    public static void viewPatients() {
+	        try (Connection con = getConnection();
+	             Statement st = con.createStatement();
+	             ResultSet rs = st.executeQuery("SELECT * FROM Patient")) {
+
+	            System.out.println("\n--- Patient Details ---");
+	            while (rs.next()) {
+	                System.out.println(
+	                        rs.getString("patientId") + " | " +
+	                        rs.getString("name") + " | " +
+	                        rs.getInt("age") + " | " +
+	                        rs.getLong("contact")
+	                );
+	            }
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    // 3️⃣ Search Patient by ID
+	    public static void getPatientById() {
+	        try (Connection con = getConnection()) {
+
+	            System.out.print("Enter Patient ID: ");
+	            String id = sc.nextLine();
+
+	            String sql = "SELECT * FROM Patient WHERE patientId = ?";
+	            PreparedStatement ps = con.prepareStatement(sql);
+	            ps.setString(1, id);
+
+	            ResultSet rs = ps.executeQuery();
+
+	            if (rs.next()) {
+	                System.out.println("\nPatient Found:");
+	                System.out.println(
+	                        rs.getString("patientId") + " | " +
+	                        rs.getString("name") + " | " +
+	                        rs.getInt("age") + " | " +
+	                        rs.getLong("contact")
+	                );
+	            } else {
+	                System.out.println("Patient ID Not Found");
+	            }
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    // 4️⃣ Update Patient Contact
+	    public static void updatePatient() {
+	        try (Connection con = getConnection()) {
+
+	            System.out.print("Enter Patient ID: ");
+	            String id = sc.nextLine();
+
+	            System.out.print("Enter New Contact Number: ");
+	            long contact = Long.parseLong(sc.nextLine());
+
+	            String sql = "UPDATE Patient SET contact = ? WHERE patientId = ?";
+	            PreparedStatement ps = con.prepareStatement(sql);
+	            ps.setLong(1, contact);
+	            ps.setString(2, id);
+
+	            int rows = ps.executeUpdate();
+	            if (rows > 0)
+	                System.out.println("Patient Updated Successfully");
+	            else
+	                System.out.println("Patient ID Not Found");
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    // 5️⃣ Delete Patient
+	    public static void deletePatient() {
+	        try (Connection con = getConnection()) {
+
+	            System.out.print("Enter Patient ID to Delete: ");
+	            String id = sc.nextLine();
+
+	            String sql = "DELETE FROM Patient WHERE patientId = ?";
+	            PreparedStatement ps = con.prepareStatement(sql);
+	            ps.setString(1, id);
+
+	            int rows = ps.executeUpdate();
+	            if (rows > 0)
+	                System.out.println("Patient Deleted Successfully");
+	            else
+	                System.out.println("Patient ID Not Found");
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    // Main Method
+	    public static void main(String[] args) {
+
+	        while (true) {
+	            System.out.println("\n===== Patient Management =====");
+	            System.out.println("1. Add Patient");
+	            System.out.println("2. View All Patients");
+	            System.out.println("3. Search Patient");
+	            System.out.println("4. Update Patient");
+	            System.out.println("5. Delete Patient");
+	            System.out.println("6. Exit");
+	            System.out.print("Enter Choice: ");
+
+	            int choice = Integer.parseInt(sc.nextLine());
+
+	            switch (choice) {
+	                case 1:
+	                    addPatient();
+	                    break;
+	                case 2:
+	                    viewPatients();
+	                    break;
+	                case 3:
+	                    getPatientById();
+	                    break;
+	                case 4:
+	                    updatePatient();
+	                    break;
+	                case 5:
+	                    deletePatient();
+	                    break;
+	                case 6:
+	                    System.out.println("Thank You");
+	                    System.exit(0);
+	                default:
+	                    System.out.println("Invalid Choice");
+	            }
+	        }
+	    }
+	}
+
 
