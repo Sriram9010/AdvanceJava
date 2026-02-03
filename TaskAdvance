@@ -1,0 +1,83 @@
+package com.pack1;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class JdbcTask15 {
+
+    static final String DRIVER = "oracle.jdbc.OracleDriver";
+    static final String URL = "jdbc:oracle:thin:@localhost:1521/orcl";
+    static final String USER = "system";
+    static final String PASSWORD = "sriram";
+
+    public static void main(String[] args) {
+
+        try {
+            Class.forName(DRIVER);
+            Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+            Scanner sc = new Scanner(System.in);
+
+           
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM food");
+
+            System.out.println("Food Menu:");
+            while (rs.next()) {
+                System.out.println(
+                    rs.getInt(1) + " " +  rs.getString(2) + " " + rs.getInt(3)  );
+            }
+
+           
+            System.out.print("Enter Food ID: ");
+            int foodId = sc.nextInt();
+
+            System.out.print("Enter Quantity: ");
+            int qty = sc.nextInt();
+
+         
+            PreparedStatement ps1 =
+                con.prepareStatement("SELECT price FROM food WHERE food_id = ?");
+            ps1.setInt(1, foodId);
+            ResultSet rs2 = ps1.executeQuery();
+
+            int price = 0;
+            if (rs2.next()) {
+                price = rs2.getInt(1);
+            }
+
+           
+            int total = price * qty;
+            System.out.println("Total Price: " + total);
+
+            System.out.print("Enter Order ID: ");
+            int orderId = sc.nextInt();
+
+            PreparedStatement ps2 =
+                con.prepareStatement("INSERT INTO orders VALUES (?, ?, ?, ?)");
+            ps2.setInt(1, orderId);
+            ps2.setInt(2, foodId);
+            ps2.setInt(3, qty);
+            ps2.setInt(4, total);
+
+            ps2.executeUpdate();
+            System.out.println("Order Inserted Successfully");
+
+            
+            ResultSet rs3 = st.executeQuery("SELECT * FROM orders");
+            System.out.println("\nAll Orders:");
+            while (rs3.next()) {
+                System.out.println(
+                    rs3.getInt(1) + " , " +
+                    rs3.getInt(2) + " , " +
+                    rs3.getInt(3) + " , " +
+                    rs3.getInt(4)
+                );
+            }
+
+            con.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
